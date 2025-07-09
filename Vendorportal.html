@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vendor Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f4f6f8;
+    }
+    .hidden { display: none; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+    .card {
+      background: white; padding: 20px; text-align: center;
+      border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      cursor: pointer;
+    }
+    input, select {
+      width: 100%; padding: 10px; margin: 10px 0;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px; background: #2980b9;
+      color: white; border: none; border-radius: 5px;
+      cursor: pointer;
+    }
+    h2 { margin-top: 0; }
+    table {
+      width: 100%; border-collapse: collapse;
+      margin-top: 20px; background: white;
+    }
+    th, td {
+      padding: 10px; border: 1px solid #ccc; text-align: left;
+    }
+    th {
+      background: #2c3e50; color: white;
+    }
+    .header {
+      background: #2c3e50; color: white; padding: 15px 20px;
+      display: flex; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Section -->
+  <div id="loginSection" class="container">
+    <h2>Vendor Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="appSection" class="hidden">
+    <div class="header">
+      <h2 id="welcomeMsg">Welcome, Vendor</h2>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+      <!-- Dashboard Menu -->
+      <div class="card-grid">
+        <div class="card" onclick="showSection('poList')">PO List</div>
+        <div class="card" onclick="showSection('createShipment')">Create Shipment</div>
+        <div class="card" onclick="showSection('uploadDocs')">Upload Documents</div>
+        <div class="card" onclick="showSection('trackShipment')">Track Shipment</div>
+        <div class="card" onclick="showSection('grn')">Goods Received</div>
+      </div>
+
+      <!-- PO List -->
+      <div id="poList" class="hidden">
+        <h2>Purchase Orders</h2>
+        <table>
+          <tr><th>PO ID</th><th>Item</th><th>Qty</th><th>Date</th><th>Status</th></tr>
+          <tr><td>PO001</td><td>Steel</td><td>1000</td><td>2025-07-15</td><td>Open</td></tr>
+          <tr><td>PO002</td><td>Bolts</td><td>500</td><td>2025-07-18</td><td>Closed</td></tr>
+        </table>
+      </div>
+
+      <!-- Create Shipment -->
+      <div id="createShipment" class="hidden">
+        <h2>Create Shipment</h2>
+        <form onsubmit="event.preventDefault(); alert('Shipment Submitted');">
+          <input type="text" placeholder="PO ID" required />
+          <input type="text" placeholder="Vehicle No" required />
+          <input type="text" placeholder="Driver Name" required />
+          <input type="date" placeholder="ETA" required />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <!-- Upload Documents -->
+      <div id="uploadDocs" class="hidden">
+        <h2>Upload Documents</h2>
+        <form onsubmit="event.preventDefault(); alert('Document Uploaded');">
+          <input type="text" placeholder="PO ID" required />
+          <select required>
+            <option value="">Select Document Type</option>
+            <option>Invoice</option>
+            <option>Delivery Note</option>
+            <option>GRN</option>
+          </select>
+          <input type="file" required />
+          <button type="submit">Upload</button>
+        </form>
+      </div>
+
+      <!-- Track Shipment -->
+      <div id="trackShipment" class="hidden">
+        <h2>Shipment Status</h2>
+        <table>
+          <tr><th>ID</th><th>PO</th><th>ETA</th><th>Status</th></tr>
+          <tr><td>S001</td><td>PO001</td><td>2025-07-12</td><td>Dispatched</td></tr>
+        </table>
+      </div>
+
+      <!-- GRN -->
+      <div id="grn" class="hidden">
+        <h2>Goods Received Notes</h2>
+        <table>
+          <tr><th>GRN ID</th><th>PO</th><th>Date</th><th>Qty</th></tr>
+          <tr><td>G001</td><td>PO001</td><td>2025-07-13</td><td>1000</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script>
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+
+    const sections = ['poList', 'createShipment', 'uploadDocs', 'trackShipment', 'grn'];
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      if (user === "vendor1" && pass === "pass123") {
+        localStorage.setItem("vendorName", user);
+        showApp();
+      } else {
+        alert("Invalid credentials");
+      }
+    }
+
+    function showApp() {
+      loginSection.classList.add("hidden");
+      appSection.classList.remove("hidden");
+      document.getElementById("welcomeMsg").innerText = `Welcome, ${localStorage.getItem("vendorName")}`;
+    }
+
+    function showSection(id) {
+      sections.forEach(sec => document.getElementById(sec).classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
+
+    // Auto login check
+    window.onload = function() {
+      if (localStorage.getItem("vendorName")) showApp();
+    }
+  </script>
+</body>
+</html>
